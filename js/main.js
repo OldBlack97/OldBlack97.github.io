@@ -1,85 +1,80 @@
-/* main function */
-import initUtils from "./utils.js";
-import initTyped from "./plugins/typed.js";
-import initModeToggle from "./tools/lightDarkSwitch.js";
-import initLazyLoad from "./layouts/lazyload.js";
-import initScrollTopBottom from "./tools/scrollTopBottom.js";
-import initLocalSearch from "./tools/localSearch.js";
-import initCopyCode from "./tools/codeBlock.js";
-import initBookmarkNav from "./layouts/bookmarkNav.js";
+$(document).ready(function(){
 
-export const main = {
-  themeInfo: {
-    theme: `Redefine v${theme.version}`,
-    author: "EvanNotFound",
-    repository: "https://github.com/EvanNotFound/hexo-theme-redefine",
-  },
-  localStorageKey: "REDEFINE-THEME-STATUS",
-  styleStatus: {
-    isExpandPageWidth: false,
-    isDark: theme.colors.default_mode && theme.colors.default_mode === "dark",
-    fontSizeLevel: 0,
-    isOpenPageAside: true,
-  },
-  printThemeInfo: () => {
-    console.log(
-      `      ______ __  __  ______  __    __  ______                       \r\n     \/\\__  _\/\\ \\_\\ \\\/\\  ___\\\/\\ \"-.\/  \\\/\\  ___\\                      \r\n     \\\/_\/\\ \\\\ \\  __ \\ \\  __\\\\ \\ \\-.\/\\ \\ \\  __\\                      \r\n        \\ \\_\\\\ \\_\\ \\_\\ \\_____\\ \\_\\ \\ \\_\\ \\_____\\                    \r\n         \\\/_\/ \\\/_\/\\\/_\/\\\/_____\/\\\/_\/  \\\/_\/\\\/_____\/                    \r\n                                                               \r\n ______  ______  _____   ______  ______ __  __   __  ______    \r\n\/\\  == \\\/\\  ___\\\/\\  __-.\/\\  ___\\\/\\  ___\/\\ \\\/\\ \"-.\\ \\\/\\  ___\\   \r\n\\ \\  __<\\ \\  __\\\\ \\ \\\/\\ \\ \\  __\\\\ \\  __\\ \\ \\ \\ \\-.  \\ \\  __\\   \r\n \\ \\_\\ \\_\\ \\_____\\ \\____-\\ \\_____\\ \\_\\  \\ \\_\\ \\_\\\\\"\\_\\ \\_____\\ \r\n  \\\/_\/ \/_\/\\\/_____\/\\\/____\/ \\\/_____\/\\\/_\/   \\\/_\/\\\/_\/ \\\/_\/\\\/_____\/\r\n                                                               \r\n  Github: https:\/\/github.com\/EvanNotFound\/hexo-theme-redefine`,
-    ); // console log message
-  },
-  setStyleStatus: () => {
-    localStorage.setItem(
-      main.localStorageKey,
-      JSON.stringify(main.styleStatus),
-    );
-  },
-  getStyleStatus: () => {
-    let temp = localStorage.getItem(main.localStorageKey);
-    if (temp) {
-      temp = JSON.parse(temp);
-      for (let key in main.styleStatus) {
-        main.styleStatus[key] = temp[key];
-      }
-      return temp;
-    } else {
-      return null;
-    }
-  },
-  refresh: () => {
-    initUtils();
-    initModeToggle();
-    initScrollTopBottom();
-    initBookmarkNav();
+
+
+    //mobile menu toggling
+    $("#menu_icon").click(function(){
+        $("header nav ul").toggleClass("show_menu");
+        $("#menu_icon").toggleClass("close_menu");
+        return false;
+    });
+
     
-    if (
-      theme.home_banner.subtitle.text.length !== 0 &&
-      location.pathname === config.root
-    ) {
-      initTyped("subtitle");
+
+    //Contact Page Map Centering
+    var hw = $('header').width() + 50;
+    var mw = $('#map').width();
+    var wh = $(window).height();
+    var ww = $(window).width();
+
+    $('#map').css({
+        "max-width" : mw,
+        "height" : wh
+    });
+
+    if(ww>1100){
+         $('#map').css({
+            "margin-left" : hw
+        });
     }
 
-    if (theme.navbar.search.enable === true) {
-      initLocalSearch();
-    }
+   
 
-    if (theme.articles.code_block.copy === true) {
-      initCopyCode();
-    }
 
-    if (theme.articles.lazyload === true) {
-      initLazyLoad();
-    }
-  },
-};
 
-export function initMain() {
-  main.printThemeInfo();
-  main.refresh();
-}
+    //Tooltip
+    $("a").mouseover(function(){
 
-document.addEventListener("DOMContentLoaded", initMain);
+        var attr_title = $(this).attr("data-title");
 
-try {
-  swup.hooks.on("page:view", () => {
-    main.refresh();
-  });
-} catch (e) {}
+        if( attr_title == undefined || attr_title == "") return false;
+        
+        $(this).after('<span class="tooltip"></span>');
+
+        var tooltip = $(".tooltip");
+        tooltip.append($(this).data('title'));
+
+         
+        var tipwidth = tooltip.outerWidth();
+        var a_width = $(this).width();
+        var a_hegiht = $(this).height() + 3 + 4;
+
+        //if the tooltip width is smaller than the a/link/parent width
+        if(tipwidth < a_width){
+            tipwidth = a_width;
+            $('.tooltip').outerWidth(tipwidth);
+        }
+
+        var tipwidth = '-' + (tipwidth - a_width)/2;
+        $('.tooltip').css({
+            'left' : tipwidth + 'px',
+            'bottom' : a_hegiht + 'px'
+        }).stop().animate({
+            opacity : 1
+        }, 200);
+       
+
+    });
+
+    $("a").mouseout(function(){
+        var tooltip = $(".tooltip");       
+        tooltip.remove();
+    });
+
+
+});
+
+
+
+
+
